@@ -1,0 +1,54 @@
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+public class PlayerUI : MonoBehaviour
+{
+    public TMP_InputField nameInputField;
+    public GameObject menuPanel;
+    public GameObject continueButton;
+    public Slider healthSlider;
+    public int maxHealth = 5;
+
+    private string playerName = "Игрок";
+    private int currentHealth;
+
+    void Start()
+    {
+        currentHealth = maxHealth;
+        UpdateHealthDisplay();
+    }
+
+    
+    public void SaveNameAndClose()
+    {
+        
+        if (nameInputField != null)
+        {
+            playerName = nameInputField.text;
+            if (string.IsNullOrEmpty(playerName))
+                playerName = "Игрок";
+        }
+
+        
+        if (continueButton != null)
+            continueButton.SetActive(false);
+        if (menuPanel != null)
+            menuPanel.SetActive(false);
+    }
+
+    public void TakeDamage()
+    {
+        if (currentHealth <= 0) return;
+
+        currentHealth--;
+        Debug.Log($"Игрок {playerName} получил урон, осталось {currentHealth}");
+        UpdateHealthDisplay();
+    }
+
+    void UpdateHealthDisplay()
+    {
+        if (healthSlider != null)
+            healthSlider.value = (float)currentHealth / maxHealth;
+    }
+}
