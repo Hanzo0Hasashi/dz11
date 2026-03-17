@@ -1,0 +1,145 @@
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+public class PlayerUI : MonoBehaviour
+{
+    [Header("Компоненты UI")]
+    [Tooltip("Панель меню, которая будет открываться/закрываться")]
+    [SerializeField] private GameObject menuPanel;
+
+    [Tooltip("Поле для ввода имени игрока")]
+    [SerializeField] private TMP_InputField nameInputField;
+
+    [Header("Отображение здоровья (выберите один вариант)")]
+    
+    [Tooltip("Текст для отображения жизней (число)")]
+    [SerializeField] private TMP_Text healthText;
+
+    
+    [Tooltip("Слайдер для отображения жизней (value от 0 до 1)")]
+    [SerializeField] private Slider healthSlider;
+
+    [Tooltip("Image с типом Filled для отображения жизней (fillAmount от 0 до 1)")]
+    [SerializeField] private Image healthFillImage;
+
+    [Header("Настройки игрока")]
+    [SerializeField] private int maxHealth = 5;
+
+  
+    private string playerName = "Игрок";
+    private int currentHealth;
+
+    private void Start()
+    {
+       
+        currentHealth = maxHealth;
+
+      
+        if (nameInputField != null)
+        {
+            nameInputField.onValueChanged.AddListener(OnNameChanged);
+           
+            playerName = nameInputField.text;
+            if (string.IsNullOrEmpty(playerName)) playerName = "Игрок";
+        }
+
+        
+        UpdateHealthDisplay();
+    }
+
+    
+    public void CloseMenu()
+    {
+        if (menuPanel != null)
+        {
+            menuPanel.SetActive(false);
+            Debug.Log($"Меню закрыто. Имя игрока: {playerName}");
+        }
+    }
+
+   
+    public void OpenMenu()
+    {
+        if (menuPanel != null)
+        {
+            menuPanel.SetActive(true);
+        }
+    }
+
+    
+    private void OnNameChanged(string newName)
+    {
+        if (!string.IsNullOrEmpty(newName))
+        {
+            playerName = newName;
+        }
+        else
+        {
+            playerName = "Игрок";
+        }
+    }
+
+    
+    public void TakeDamage()
+    {
+        if (currentHealth <= 0)
+        {
+            Debug.Log($"{playerName} уже мертв, нельзя нанести больше урона.");
+            return;
+        }
+
+        currentHealth--;
+
+        Debug.Log($"Игрок {playerName} получил урон, осталось {currentHealth}");
+
+        UpdateHealthDisplay();
+
+        if (currentHealth <= 0)
+        {
+            Debug.Log($"{playerName} погиб.");
+        }
+    }
+
+   
+    private void UpdateHealthDisplay()
+    {
+        
+        if (healthText != null)
+        {
+            healthText.text = $"Жизни: {currentHealth} / {maxHealth}";
+        }
+
+        float normalizedHealth = (float)currentHealth / maxHealth;
+
+      
+        if (healthSlider != null)
+        {
+            healthSlider.value = normalizedHealth;
+        }
+
+       
+        if (healthFillImage != null)
+        {
+            healthFillImage.fillAmount = normalizedHealth;
+        }
+    }
+
+    public string GetPlayerName()
+    {
+        return playerName;
+    }
+
+    public int GetCurrentHealth()
+    {
+        return currentHealth;
+    }
+
+    private void OnDestroy()
+    {
+        if (nameInputField != null)
+        {
+            nameInputField.onValueChanged.RemoveListener(OnNameChanged);
+        }
+    }
+}
